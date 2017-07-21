@@ -11,6 +11,7 @@
     ],
     "require": {
         "php": ">=7.0.0",
+        "catpkt/encryptor": ">=0.0.1",
         "symfony/http-foundation": "~3.2",
         "fenzland/http": "^0.1.3"
     },
