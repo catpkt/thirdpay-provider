@@ -89,7 +89,7 @@ abstract class AThirdPayProvider
 			$requests->get( 'code' ),
 			$requests->get( 'amount' ),
 			$requests->get( 'comment' ),
-			$requests->get( 'extends', [] ),
+			$requests->get( 'extensions', [] ),
 		]);
 	}
 
@@ -104,11 +104,11 @@ abstract class AThirdPayProvider
 	 * @param  string $code
 	 * @param  int $amount
 	 * @param  string $comment
-	 * @param  array $extends
+	 * @param  array $extensions
 	 *
 	 * @return Response
 	 */
-	abstract protected function createPay( string$userId, string$code, int$amount, string$comment, array$extends=[] ):Response;
+	abstract protected function createPay( string$userId, string$code, int$amount, string$comment, array$extensions=[] ):Response;
 
 	/**
 	 * Method actionAsyncCallback
@@ -121,9 +121,15 @@ abstract class AThirdPayProvider
 	 */
 	private function actionAsyncCallback( Request$request ):Response
 	{
-		$payload= $this->parseCallback( $request );
+		try{
+			$payload= $this->parseCallback( $request );
 
-		$result= $this->sendToApp( $payload );
+			$result= $this->sendToApp( $payload );
+		}
+		catch( \Throwable$e )
+		{
+			return $this->handleCallbackException( $e );
+		}
 
 		return $this->respondCallback( $result );
 	}
@@ -155,6 +161,19 @@ abstract class AThirdPayProvider
 	abstract protected function respondCallback( CallbackResult$result ):Response;
 
 	/**
+	 * Method handleCallbackException
+	 *
+	 * @abstract
+	 *
+	 * @access protected
+	 *
+	 * @param  Throwable $e
+	 *
+	 * @return Response
+	 */
+	abstract protected function handleCallbackException( \Throwable$e ):Response;
+
+	/**
 	 * Method sendToApp
 	 *
 	 * @access private
@@ -165,13 +184,13 @@ abstract class AThirdPayProvider
 	 */
 	private function sendToApp( CallbackPayload$payload ):CallbackResult
 	{
-		return new CallbackResult(
-			HTTP::url( trim( $this->app->getApiUri(), '/' ).'/callback' )->post(
-				$this->app->encrypt(
-					$payload->getDetails()
-				)
+		$response= HTTP::url( trim( $this->app->getApiUri(), '/' ).'/callback' )->post(
+			$this->app->encrypt(
+				$payload->getDetails()
 			)
 		);
+
+		return new CallbackResult( $response->status, $this->app->decrypt( $response->body ) );
 	}
 
 }
