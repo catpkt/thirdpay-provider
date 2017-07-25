@@ -54,15 +54,27 @@ class CallbackResult
 	}
 
 	/**
-	 * Method getMessoge
+	 * Method getPayload
+	 *
+	 * @access public
+	 *
+	 * @return array
+	 */
+	public function getPayload():array
+	{
+		return $this->payload;
+	}
+
+	/**
+	 * Method getMessage
 	 *
 	 * @access public
 	 *
 	 * @return string
 	 */
-	public function getMessoge():string
+	public function getMessage():string
 	{
-		return $this->message;
+		return $this->payload['message'];
 	}
 
 }
