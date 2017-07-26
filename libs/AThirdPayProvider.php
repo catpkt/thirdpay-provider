@@ -84,12 +84,13 @@ abstract class AThirdPayProvider
 	 */
 	private function actionCreatePay( Request$request ):Response
 	{
+		$payload= $this->app()->getEncryptor()->decrypt( $request->getContent() );
 		return $this->createPay(...[
-			$requests->get( 'thirdId' ),
-			$requests->get( 'code' ),
-			$requests->get( 'amount' ),
-			$requests->get( 'comment' ),
-			$requests->get( 'extensions', [] ),
+			$payload['code'],
+			$payload['amount'],
+			$payload['comment'],
+			$payload['thirdId']??null,
+			$payload['extensions']??[],
 		]);
 	}
 
@@ -100,15 +101,15 @@ abstract class AThirdPayProvider
 	 *
 	 * @access protected
 	 *
-	 * @param  string $user
 	 * @param  string $code
 	 * @param  int $amount
 	 * @param  string $comment
+	 * @param  string $userId
 	 * @param  array $extensions
 	 *
 	 * @return Response
 	 */
-	abstract protected function createPay( string$userId, string$code, int$amount, string$comment, array$extensions=[] ):Response;
+	abstract protected function createPay( string$code, int$amount, string$comment, string$userId=null, array$extensions=[] ):Response;
 
 	/**
 	 * Method actionAsyncCallback
