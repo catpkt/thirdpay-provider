@@ -44,7 +44,7 @@ abstract class AThirdPayProvider
 	public function handle( Request$request, string$baseUrl='/' ):Response
 	{
 		return new Response(
-			$this->app()->getEncryptor()->encrypt(
+			$this->app->getEncryptor()->encrypt(
 				$this->{'action'.$this->route( $request, $baseUrl )}( $request )
 			)
 		);
@@ -80,11 +80,11 @@ abstract class AThirdPayProvider
 	 *
 	 * @param  Request $request
 	 *
-	 * @return Response
+	 * @return array
 	 */
-	private function actionCreatePay( Request$request ):Response
+	private function actionCreatePay( Request$request ):array
 	{
-		$payload= $this->app()->getEncryptor()->decrypt( $request->getContent() );
+		$payload= $this->app->getEncryptor()->decrypt( $request->getContent() );
 		return $this->createPay(...[
 			$payload['code'],
 			$payload['amount'],
@@ -107,9 +107,9 @@ abstract class AThirdPayProvider
 	 * @param  string $userId
 	 * @param  array $extensions
 	 *
-	 * @return Response
+	 * @return array
 	 */
-	abstract protected function createPay( string$code, int$amount, string$comment, string$userId=null, array$extensions=[] ):Response;
+	abstract protected function createPay( string$code, int$amount, string$comment, string$userId=null, array$extensions=[] ):array;
 
 	/**
 	 * Method actionAsyncCallback

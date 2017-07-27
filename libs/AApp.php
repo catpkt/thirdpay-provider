@@ -2,11 +2,13 @@
 
 namespace CatPKT\ThirdPayProvider;
 
+use CatPKT\Encryptor\TWithEncryptor;
+
 ////////////////////////////////////////////////////////////////
 
 abstract class AApp
 {
-	use CatPKT\Encryptor\TWithEncryptor;
+	use TWithEncryptor;
 
 	/**
 	 * Method getApiUri
